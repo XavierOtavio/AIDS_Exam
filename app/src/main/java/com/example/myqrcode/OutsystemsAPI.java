@@ -16,7 +16,7 @@ public class OutsystemsAPI extends AppCompatActivity {
     static String apiUrl = "https://personal-8o07igno.outsystemscloud.com/AIDS/rest/RestAPI/";
 
     public static void verifyReservation(String hash, int roomId, Context context, VolleyCallback callback) {
-        String url = apiUrl + "VerifyReservation?hash=" + hash + "&roomId=" + roomId;
+        String url = apiUrl + "RegisterExit?hash=" + hash + "&roomId=" + roomId;
 
         RequestQueue queue = Volley.newRequestQueue(context);
 
