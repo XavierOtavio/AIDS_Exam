@@ -64,8 +64,13 @@ public class RoomAdapter extends ArrayAdapter<Room> {
                     intent.putExtra("roomId", room.getId());
                     intent.putExtra("roomName", room.getName());
 
+                    byte[] byteArray = convertBitmapToByteArray(bitmap);
+
+                    intent.putExtra("roomQr", byteArray);
+
                     getContext().startActivity(intent);
                 });
+
 
             } catch (WriterException e) {
                 throw new RuntimeException(e);
@@ -74,5 +79,11 @@ public class RoomAdapter extends ArrayAdapter<Room> {
         }
         return convertView;
     }
+    private byte[] convertBitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
 }
 

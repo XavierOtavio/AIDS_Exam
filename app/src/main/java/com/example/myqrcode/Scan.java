@@ -9,6 +9,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -17,6 +19,7 @@ import com.example.myqrcode.databinding.ActivityScanBinding;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Scan extends AppCompatActivity {
@@ -43,6 +46,13 @@ public class Scan extends AppCompatActivity {
     private void setResult(String contents) {
         binding.textResult.setText(contents);
     }
+    private void setQrImage(byte[] byteArray) {
+        System.out.println(Arrays.toString(byteArray));
+        if (byteArray != null) {
+            Bitmap roomQrBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            binding.qrImage.setImageBitmap(roomQrBitmap);
+        }
+    }
 
     private void showCamera() {
         ScanOptions options = new ScanOptions();
@@ -65,13 +75,20 @@ public class Scan extends AppCompatActivity {
 
     private void initViews() {
         binding.fab.setOnClickListener(view -> {
-            checkPermissionAndShowActivity(this);
+            int roomId = getIntent().getIntExtra("roomId", -1);
+
+            if (roomId != -1) {
+                checkPermissionAndShowActivity(this);
+            } else {
+                Toast.makeText(Scan.this, "Please, choose a room before trying to read Qr", Toast.LENGTH_SHORT).show();
+            }
         });
         binding.btnGoToRoomList.setOnClickListener(view -> {
             Intent intent = new Intent(Scan.this, ActivityRoomList.class);
             startActivity(intent);
         });
         setResult(getIntent().getStringExtra("roomName"));
+        setQrImage(getIntent().getByteArrayExtra("roomQr"));
     }
 
     private void checkPermissionAndShowActivity(Context context) {
@@ -94,23 +111,23 @@ public class Scan extends AppCompatActivity {
 
     private void compareHashAndRoomId(String scannedContent) {
         int roomId = getIntent().getIntExtra("roomId", -1);
-        OutsystemsAPI.verifyReservation(scannedContent, roomId,this, new OutsystemsAPI.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
+            OutsystemsAPI.verifyReservation(scannedContent, roomId, this, new OutsystemsAPI.VolleyCallback() {
+                @Override
+                public void onSuccess(String result) {
 
-                Toast.makeText(Scan.this, "API response: " + result, Toast.LENGTH_SHORT).show();
-            }
+                    Toast.makeText(Scan.this, "API response: " + result, Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onSuccess(List<Room> result) {
+                @Override
+                public void onSuccess(List<Room> result) {
 
-            }
+                }
 
-            @Override
-            public void onError(String error) {
+                @Override
+                public void onError(String error) {
 
-                Toast.makeText(Scan.this, "API error: " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(Scan.this, "API error: " + error, Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 }
