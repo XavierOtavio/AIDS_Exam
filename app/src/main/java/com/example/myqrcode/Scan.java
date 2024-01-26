@@ -7,13 +7,17 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.myqrcode.databinding.ActivityScanBinding;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+
+import java.util.List;
 
 public class Scan extends AppCompatActivity {
 
@@ -63,6 +67,11 @@ public class Scan extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> {
             checkPermissionAndShowActivity(this);
         });
+        binding.btnGoToRoomList.setOnClickListener(view -> {
+            Intent intent = new Intent(Scan.this, ActivityRoomList.class);
+            startActivity(intent);
+        });
+        setResult(getIntent().getStringExtra("roomName"));
     }
 
     private void checkPermissionAndShowActivity(Context context) {
@@ -84,12 +93,17 @@ public class Scan extends AppCompatActivity {
     }
 
     private void compareHashAndRoomId(String scannedContent) {
-        int roomId = 1;
+        int roomId = getIntent().getIntExtra("roomId", -1);
         OutsystemsAPI.verifyReservation(scannedContent, roomId,this, new OutsystemsAPI.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
 
                 Toast.makeText(Scan.this, "API response: " + result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(List<Room> result) {
+
             }
 
             @Override
